@@ -1,0 +1,103 @@
+#+title: org-noter-rehighlight
+#+author: Pablo Cobelli
+#+date: 2026-02-20
+#+options: toc:2
+
+* Overview
+=org-noter-rehighlight= provides small helper commands to *reapply* highlights recorded by =org-noter= (PDF Tools backend) as =pdf-tools= *session* annotations.
+
+The typical workflow is:
+
+1. You create precise notes with org-noter while reading a PDF in =pdf-view-mode=.
+2. Org-noter stores highlight metadata in the notes Org file (e.g. the =:HIGHLIGHT:= property with a serialized =pdf-highlight= structure).
+3. Later, you reopen the same org-noter notes file and PDF.
+4. This package rehydrates those stored highlights into visible highlights in the PDF buffer *without modifying the PDF file* (unless you explicitly save it).
+
+*Important:* The highlights created by this package are =pdf-tools= annotations in the current Emacs session. They become permanent only if you save the PDF buffer.
+
+* Requirements
+- Emacs 27.1+
+- Org mode (bundled with Emacs; version 9.4+ recommended)
+- =pdf-tools= (PDF Tools)
+- =org-noter= (Vedang’s implementation; PDF Tools backend)
+
+This package assumes the org-noter notes file contains a property like:
+
+:PROPERTIES:
+:HIGHLIGHT: #s(pdf-highlight 1 (1 (x1 y1 x2 y2)))
+:END:
+
+and uses the region payload =(1 (x1 y1 x2 y2 ...))= in the same shape returned by =(pdf-view-active-region)=.
+
+* Installation
+** Manual installation (generic Emacs)
+1. Save =org-noter-rehighlight.el= somewhere in your load path, for example:
+   - =~/.emacs.d/lisp/org-noter-rehighlight.el=
+
+2. Add the directory to your load path and require the library:
+   #+begin_src emacs-lisp
+   (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+   (require 'org-noter-rehighlight)
+   #+end_src
+
+3. Restart Emacs (or evaluate the above).
+
+** Doom Emacs
+1. Place the file in:
+   - =~/.doom.d/lisp/org-noter-rehighlight.el=
+
+2. In =~/.doom.d/config.el=:
+   #+begin_src emacs-lisp
+   (add-to-list 'load-path (expand-file-name "lisp" doom-user-dir))
+   (require 'org-noter-rehighlight)
+   #+end_src
+
+3. Reload Doom:
+   - =M-x doom/reload= (or restart Emacs)
+
+* Usage
+These commands must be invoked from an *org-noter notes buffer* (the Org file containing your notes), with an active org-noter session and the corresponding PDF opened via =pdf-tools=.
+
+** Commands
+- =M-x org-noter-rehighlight-at-point=
+  Reapply the current heading’s =:HIGHLIGHT:= as a pdf-tools highlight annotation.
+
+- =M-x org-noter-rehighlight-buffer-batch=
+  Scan all headings in the current notes file and reapply every =:HIGHLIGHT:= found. This runs in a batch mode (selects the PDF window once) to minimize flicker between pdf and notes windows.
+
+** Example workflow
+1. Start an org-noter session for a paper:
+   - Open the PDF with pdf-tools (PDFView).
+   - Start org-noter and create precise notes/highlights.
+
+2. Eventually close the org-noter session.
+
+3. Later, reopen the notes Org file and start org-noter again.
+
+4. Reapply highlights:
+   - To reapply only one highlight (current heading):
+     - =M-x org-noter-rehighlight-at-point=
+   - To reapply all highlights in the notes file:
+     - =M-x org-noter-rehighlight-buffer-batch=
+
+* Notes and caveats
+- The produced highlights are *session annotations* managed by =pdf-tools=. They will not modify your PDF file unless you explicitly save the PDF buffer.
+- The code currently targets the =org-noter= + =pdf-tools= integration used by Vedang’s org-noter implementation. Other forks/backends may store highlight metadata differently.
+- This package intentionally keeps its scope small: it does not attempt to maintain a persistent overlay layer, add hooks to page changes, or manage highlight lifecycles beyond reapplication.
+
+* Troubleshooting
+- If you see no highlights:
+  - Ensure you are running the command from the org-noter notes buffer (Org mode).
+  - Ensure a session is active and the PDF is opened in =pdf-view-mode= (PDF Tools).
+  - Verify that your headings actually contain a =:HIGHLIGHT:= property.
+
+- If highlights appear but are not where expected:
+  - Confirm that org-noter stored the correct =:HIGHLIGHT:= structure.
+  - Confirm you are viewing the same PDF file that was used when taking notes.
+
+* Contributing
+Contributions, bug reports, and feature requests are welcome. Please include:
+- Emacs version
+- pdf-tools version
+- org-noter version/fork
+- A minimal reproducible example (ideally with a small PDF and notes file)
