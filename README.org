@@ -19,7 +19,7 @@ The typical workflow is:
 - Emacs 27.1+
 - Org mode (bundled with Emacs; version 9.4+ recommended)
 - =pdf-tools= (PDF Tools)
-- =org-noter= (Vedang’s implementation; PDF Tools backend)
+- =org-noter= (PDF Tools backend)
 
 This package assumes the org-noter notes file contains a property like:
 
