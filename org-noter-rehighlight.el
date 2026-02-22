@@ -4,7 +4,7 @@
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "27.1") (org "9.4") (pdf-tools "1.0"))
 ;; Keywords: outlines, pdf, org, annotations
-;; URL: https://example.invalid/org-noter-rehighlight
+;; URL: https://github.com/pablocobelli/org-noter-rehighlight
 ;;
 ;; This file is not part of GNU Emacs.
 
